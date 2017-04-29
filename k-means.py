@@ -2,6 +2,7 @@
 import numpy as np
 import ast
 import math
+import matplotlib.pyplot as plt
 
 
 def euclidean_dist(a,b):
@@ -18,11 +19,11 @@ def change_centroids(clustering,remove_data):
 				del clustering[i]
 				continue
 			new_centroid = [0.0,0.0,0.0,0.0]
-			for j in clustering[i]:
-				for z in range(len(j)):
+			for e in clustering[i]:
+				for z in range(len(e)):
 					if z == 4:
 						break
-					new_centroid[z]+=j[z]
+					new_centroid[z]+=e[z]
 		
 			new_centroid = [x/len(clustering[i]) for x in new_centroid]
 			del clustering[i]
@@ -33,11 +34,11 @@ def change_centroids(clustering,remove_data):
 				del clustering[i]
 				continue
 			new_centroid = [0.0,0.0,0.0,0.0]
-			for j in clustering[i]:
-				for z in range(len(j)):
+			for e in clustering[i]:
+				for z in range(len(e)):
 					if z == 4:
 						break
-					new_centroid[z]+=j[z]
+					new_centroid[z]+=e[z]
 		
 			new_centroid = [x/len(clustering[i]) for x in new_centroid]
 			clustering[repr(new_centroid)] = clustering[i]
@@ -46,8 +47,8 @@ def change_centroids(clustering,remove_data):
 def calc_SS_total(clustering):
 	total_sum = 0
 	for i in clustering.keys():
-		for j in clustering[i]:
-			total_sum+= euclidean_dist(j[0:4],ast.literal_eval(i))**2
+		for e in clustering[i]:
+			total_sum+= euclidean_dist(e[0:4],ast.literal_eval(i))**2
 	return total_sum
 
 
@@ -65,7 +66,7 @@ if __name__ =='__main__':
 			x[y] = float(x[y])
 	complete_ss_totals = []
 	three_best_clustering = []
-	for j in(0,3):
+	for j in range(0,3):
 		print 'doing a k-means run for index: ',(j+3)
 		SS_totals = []
 		best_clustering = []
@@ -125,22 +126,33 @@ if __name__ =='__main__':
 						change_centroids(curr_clustering,should_remove_data_points)
 				print('calculating ss_totals')
 				SS_totals.append((curr_clustering, calc_SS_total(curr_clustering)))
-			print(SS_totals[0])
-			print(len(SS_totals))
+			#print(SS_totals[0])
+			#print(len(SS_totals))
 			best_ss = SS_totals[i*4][1]
 			best_clustering_to_add = SS_totals[i*4][0]
 			for z in range(i*4,4*(i+1)):
 				if SS_totals[z][1] < best_ss:
 					best_ss = SS_totals[z][1]
 					best_clustering_to_add = SS_totals[z][0]
-			print('best clustering: ',best_clustering_to_add)
+			#print('best clustering: ',best_clustering_to_add)
 			best_clustering.append(best_clustering_to_add)
 		complete_ss_totals.append(SS_totals)
 		three_best_clustering.append(best_clustering)
-	print(complete_ss_totals)
-	print(three_best_clustering)
+	#print(complete_ss_totals[0][1])
+	#print(three_best_clustering)
 
-				 
+	for j in range(0,3):
+		list_to_plot = []
+		for x in range(len(complete_ss_totals[j])):
+			list_to_plot.append(complete_ss_totals[j][x][1])
+		print(list_to_plot)
+		plt.plot(list_to_plot)
+		curr_title = 'The ss_totals for k-means clustering where k = ',(j+3)
+		plt.title(curr_title)
+		plt.ylabel('ss_totals')
+		if j != 2:
+			plt.figure()
+	plt.show()			 
 		
 	
 	#graph that stuff
