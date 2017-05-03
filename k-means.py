@@ -164,41 +164,145 @@ if __name__ =='__main__':
 		plt.title(curr_title)
 		plt.ylabel('ss_totals')
 		if j != 2:
-			plt.figure()
-	#plt.show()		
+			plt.figure()					
 		 
+	
+	
+	num_correct =0.0
+	
+	F_avg =[]
+	for cluster in three_best_clustering:
+		F_scores = []	
+		for key in cluster.keys():
+			for j in ['Iris-setosa','Iris-versicolor','Iris-virginica']:
+				num_correct = 0.0
+				for flower in cluster[key]:
+					if flower[4] == j:
+						cur_min = euclidean_dist(flower[:4],ast.literal_eval(cluster.keys()[0]))
+						cur_min_centroid = cluster.keys()[0]
+						for i  in cluster.keys():
+							if euclidean_dist(flower[:4],ast.literal_eval(i))<cur_min:
+								cur_min = euclidean_dist(flower[:4],ast.literal_eval(i))
+								cur_min_centroid = i
+						if flower in cluster[cur_min_centroid]:
+							num_correct+=1
+					
+				#print(num_correct)	
+				recall = num_correct/50.0
+				precision = num_correct/len(cluster[key])
+				if (recall+precision) != 0:
+					F_scores.append((2.0*recall*precision)/(recall+precision))
+				
+		avg=0.0	
+		total =0.0
+		for f_score in range(len(F_scores)):
+			total +=F_scores[f_score]
+			avg = total/len(F_scores)
+		F_avg.append(avg)
+		print("AVERAGE: ", avg)
+	best_avg=0
+	for i in range(3):
+		if F_avg[i]> F_avg[best_avg]:
+			best_avg =i
+	print("BEST CLUSTER AVG: " ,best_avg + 3)
+
+	
+	
+
 	fig = plt.figure(4, figsize=(8, 6))
 	ax = Axes3D(fig, elev=-150, azim=110)
 	centroids=[]
-	Y=[]
-	X=[]
-	data = []
-	color=0
-	colors=["purple","red","cyan","blue","green"]
-	for cluster in three_best_clustering:
-		for centroid in cluster.keys():
-			centroids.append(ast.literal_eval(centroid))
-			for idx in cluster[centroid]:
-				X.append(idx[0:4])
-				Y.append(colors[color])
-			#ax.scatter([cluster[0][1]],[cluster[0][2]],cluster[0][3],c=colors[color],marker='*',s=[200])
-			color+=1
-		color = 0
-	X=np.array(X)
-	print(centroids)
-	print(X)
-
-	ax.scatter(X[:, a1], X[:, a2], X[:, a3], c=Y,
-	           cmap=plt.cm.Paired)
-
+	X=[]	#Sepal Length","Sepal Width","Petal Length","Petal Width"
+	Y= []   #MULTICOLOR ATTRIBUTE	
+	color =0
+	colors = ["red","blue","green","cyan","black"]
 	title=["Sepal Length","Sepal Width","Petal Length","Petal Width"]
-	ax.set_title("Best Clustering:")
+	centroid_colors = []
+	ax.set_title("SepalLengthvs SepalWidth vs PetalLength")
+	#print(three_best_clustering[best_avg])
+	for centroid in three_best_clustering[best_avg].keys():
+		centroids.append(ast.literal_eval(centroid))
+		for idx in three_best_clustering[best_avg][centroid]:
+			X.append(idx)
+			Y.append(colors[color])
+		centroid_colors.append(colors[color])
+		color+=1
+	
+	for j in range(len(centroids)):
+		#print(Y[j])
+		ax.scatter(X[j][0], X[j][1], X[j][2], c=centroid_colors[j], marker='*',s=[200],cmap=plt.cm.Paired)
+	for i in range(len(X)):
+		ax.scatter(X[i][0], X[i][1], X[i][2], c=Y[i], cmap=plt.cm.Paired)
+
+
+	ax.set_xlabel(title[0])
+	ax.w_xaxis.set_ticklabels([])
+	ax.set_ylabel(title[1])
+	ax.w_yaxis.set_ticklabels([])
+	ax.set_zlabel(title[2])
+	ax.w_zaxis.set_ticklabels([])
+	
+
+	
+	fig = plt.figure(5, figsize=(8, 6))
+	ax = Axes3D(fig, elev=-150, azim=110)
+	ax.set_title("SepalLengthvsSepalWidthvsPetalWidth")
+	for j in range(len(centroids)):
+		#print(Y[j])
+		ax.scatter(X[j][0], X[j][1], X[j][3], c=centroid_colors[j], marker='*',s=[200],cmap=plt.cm.Paired)
+	for i in range(len(X)):
+		ax.scatter(X[i][0], X[i][1], X[i][3], c=Y[i], cmap=plt.cm.Paired)
+
+
+	ax.set_xlabel(title[0])
+	ax.w_xaxis.set_ticklabels([])
+	ax.set_ylabel(title[1])
+	ax.w_yaxis.set_ticklabels([])
+	ax.set_zlabel(title[3])
+	ax.w_zaxis.set_ticklabels([])
+
+
+
+	fig = plt.figure(6, figsize=(8, 6))
+	ax = Axes3D(fig, elev=-150, azim=110)
+	ax.set_title("SepalLengthvsPetalLengthvsPetalWidth")
+	for j in range(len(centroids)):
+		#print(Y[j])
+		ax.scatter(X[j][0], X[j][2], X[j][3], c=centroid_colors[j], marker='*',s=[200],cmap=plt.cm.Paired)
+	for i in range(len(X)):
+		ax.scatter(X[i][0], X[i][2], X[i][3], c=Y[i], cmap=plt.cm.Paired)
+
+
+	ax.set_xlabel(title[0])
+	ax.w_xaxis.set_ticklabels([])
+	ax.set_ylabel(title[2])
+	ax.w_yaxis.set_ticklabels([])
+	ax.set_zlabel(title[3])
+	ax.w_zaxis.set_ticklabels([])
+
+
+
+	
+	fig = plt.figure(7, figsize=(8, 6))
+	ax = Axes3D(fig, elev=-150, azim=110)
+	ax.set_title("SepalWidthvsPetal Length	vsPetal	Width")
+	for j in range(len(centroids)):
+		#print(Y[j])
+		ax.scatter(X[j][1], X[j][2], X[j][3], c=centroid_colors[j], marker='*',s=[200],cmap=plt.cm.Paired)
+	for i in range(len(X)):
+		ax.scatter(X[i][1], X[i][2], X[i][3], c=Y[i], cmap=plt.cm.Paired)
+
+
 	ax.set_xlabel(title[1])
 	ax.w_xaxis.set_ticklabels([])
 	ax.set_ylabel(title[2])
 	ax.w_yaxis.set_ticklabels([])
 	ax.set_zlabel(title[3])
 	ax.w_zaxis.set_ticklabels([])
+
+
+
+
 
 	plt.show()		
 
